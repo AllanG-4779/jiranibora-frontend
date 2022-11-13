@@ -1,0 +1,51 @@
+* {
+  box-sizing: border-box;
+}
+.active {
+  background-color: #1593b652;
+  border-radius: 2px;
+  text-align: center;
+  color: white;
+}
+.menuOf {
+  display: none;
+  transition: display 300ms ease-in-out;
+}
+.menuOn {
+  transition: all 3s;
+}
+.sidebar {
+  gap: 10;
+}
+.sidebar-item {
+  align-items: center;
+  height: 2em;
+  color: #afbfc8;
+  height: 3rem;
+
+  position: relative;
+}
+.sidebar-icon {
+  margin-right: 1rem;
+  font-size: 1.5em;
+  color: #afbfc8;
+  opacity: 0.6;
+  align-self: baseline;
+  margin-left: 0.9em;
+  align-self: center;
+}
+
+.active {
+  background-color: #1b2025;
+  color:whitesmoke;
+
+  /* content: "";
+  */
+}
+.sidebar-text {
+  font-size: 0.9em;
+}
+.sidebar-item:hover{
+  background-color: #1b2025;
+  
+}
