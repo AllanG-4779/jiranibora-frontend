@@ -85,7 +85,7 @@ const Approved = (props: any) => {
                         onDoubleClick={() => {
                           setParameter({
                             name: "name",
-                            value: each.firstName +" "+ each.lastName,
+                            value: each.firstName + " " + each.lastName,
                             memberId: each.applicationRef,
                           });
                           onOpen();
@@ -169,7 +169,7 @@ const Approved = (props: any) => {
                       value: parameter.value,
                     },
                   });
-                  onClose()
+                  onClose();
                 }}
               >
                 Update

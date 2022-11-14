@@ -41,7 +41,7 @@ export type sessionType = {
     access_token: string;
     fullName: string;
     phone: string;
-    monthlyCont:string;
+    monthlyCont: string;
     memberId: string;
   };
   expires: string;
@@ -121,7 +121,7 @@ export type loanDataType = {
     initialDuration: number;
     initialInterest: number;
     extraInterest: number;
-    outstandingAmount:number
+    outstandingAmount: number;
 
     status: string;
   }[];
@@ -231,3 +231,9 @@ export type performanceData = {
     value: number;
   }[];
 };
+export type users = {
+  memberId: string;
+  fullName: string;
+  role: string;
+  status: boolean;
+}[];
