@@ -12,6 +12,7 @@ import {
   Td,
   Badge,
   Button,
+  Alert,
 } from "@chakra-ui/react";
 import getTime from "date-fns/getTime";
 import { getSession, useSession } from "next-auth/react";
@@ -29,7 +30,7 @@ import { loanDataType, sessionType } from "../../types";
 
 const Loan = () => {
   const tokenContext = useContext(TokenContext);
-  const clientData = useContext(ClientContext);
+  const [clientSession, setSession] = useState<sessionType|null>(null)
   const [loading, setLoading] = useState(false);
   const [loanData, setLoanData] = useState<loanDataType | null>(null);
   const [token, setToken] = useState("");
@@ -41,11 +42,13 @@ const Loan = () => {
       const authToken = (await getSession()) as sessionType;
       if (authToken) {
         setToken(authToken.user.access_token);
+        setSession(authToken)
       }
+
 
       // Check the username+
       const getLoanResult = await fetchData({
-        token: token,
+        token: authToken.user.access_token,
         url: "loan/client/all",
         method: "GET",
       });
@@ -61,10 +64,10 @@ const Loan = () => {
         <Text fontFamily={"body"} fontSize="xl">
           Good Afternoon,{" "}
           <span style={{ fontWeight: "bolder" }}>
-            {clientData?.accountHolder.split(" ")[0]}
+           { clientSession !==null?clientSession?.user.fullName:"User"}
           </span>
         </Text>
-        <Flex
+      { typeof loanData !=="undefined" &&loanData !==null?  <Flex
           width="100%"
           bg="white"
           p={10}
@@ -152,6 +155,7 @@ const Loan = () => {
                   <Th>Expected Interest</Th>
 
                   <Th>Overflow Cost</Th>
+                  <Th>Loan Balance</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -179,13 +183,14 @@ const Loan = () => {
                         <Td isNumeric>KES {each.initialInterest}</Td>
 
                         <Td isNumeric>KES {each.extraInterest}</Td>
+                        <Td isNumeric>KES {each.outstandingAmount}</Td>
                       </Tr>
                     );
                   })}
               </Tbody>
             </Table>
           </TableContainer>
-        </Flex>
+        </Flex>:<Alert colorScheme="red">You have not applied for any loan so far!</Alert>}
         <Button
           as={"a"}
           href="/client/loan/apply"

@@ -121,6 +121,7 @@ export type loanDataType = {
     initialDuration: number;
     initialInterest: number;
     extraInterest: number;
+    outstandingAmount:number
 
     status: string;
   }[];

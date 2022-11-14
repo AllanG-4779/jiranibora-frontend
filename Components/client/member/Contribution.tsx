@@ -92,7 +92,7 @@ const Contribution = () => {
               <Text color="gray">Late payment Penalties</Text>
             </Box>
           </Flex>
-          <Box
+          {/* <Box
             display={"flex"}
             width="100%"
             gap={2}
@@ -109,7 +109,7 @@ const Contribution = () => {
                 <option>2022</option>
               </Select>
             </Box>
-          </Box>
+          </Box> */}
           {contribution == null || contribution.length <= 0 ? (
             <Alert mt={3}>You have not made any contribution</Alert>
           ) : (
