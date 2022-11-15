@@ -6,8 +6,9 @@ import {
   Button,
   Badge,
   Spinner,
+  Alert,
 } from "@chakra-ui/react";
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { clientPost, fetchData } from "../../../Commons";
@@ -32,7 +33,36 @@ const UserRole = () => {
     });
     if (post_data) {
       setLoading(false);
-      setMessage("Successfully updated");
+      setMessage(`User ${memberActivate.action}d successfully`);
+      setTimeout(() => {
+        setMessage("");
+      }, 5000);
+    }
+  };
+  const updateRole = async () => {
+    setLoading(true);
+    const session = (await getSession()) as sessionType;
+    const post_data = await clientPost({
+      url: `update/role`,
+      method: "PATCH",
+      token: session.user.access_token,
+      data: memberRole,
+    });
+    if (post_data) {
+      setLoading(false);
+      setMessage(
+        `Member ${memberRole.memberId} was set as the new ${memberRole.role} successfully`
+      );
+      setTimeout(() => {
+        setMessage("");
+      }, 5000);
+
+      if (memberRole.role === "CHAIR") {
+        setMessage(
+          "Chairperson role changed, you will be logged out in 5 seconds"
+        );
+        setTimeout(() => signOut({ callbackUrl: "/login" }), 10000);
+      }
     }
   };
   useEffect(() => {
@@ -133,7 +163,9 @@ const UserRole = () => {
                 options={
                   activePersons !== null && typeof activePersons !== "undefined"
                     ? activePersons
-                        .filter((record) => record.role === "USER")
+                        .filter(
+                          (record) => record.role === "USER" && record.status
+                        )
                         .map((each) => {
                           return {
                             value: each.memberId,
@@ -167,10 +199,21 @@ const UserRole = () => {
                 }
                 colorScheme="green"
                 size="sm"
+                onClick={updateRole}
               >
-                Update Role
+                {loading ? <Spinner /> : "Change Role"}
               </Button>
             </Box>
+            <Alert
+              display={
+                message.length > 1 && message.startsWith("Member")
+                  ? "flex"
+                  : "none"
+              }
+              colorScheme={"red"}
+            >
+              {message}
+            </Alert>
           </Flex>{" "}
           <Flex mt={10} direction="column" gap={5} width="100%">
             <Box width="70%">
@@ -230,6 +273,27 @@ const UserRole = () => {
                 {loading ? <Spinner /> : "Execute"}
               </Button>
             </Box>
+            <Alert
+              display={
+                message.length > 1 && message.startsWith("User")
+                  ? "flex"
+                  : "none"
+              }
+              colorScheme={"green"}
+            >
+              {message}
+            </Alert>
+            <Alert
+              justifySelf={"center"}
+              display={
+                message.length > 1 && message.startsWith("Chairperson")
+                  ? "flex"
+                  : "none"
+              }
+              colorScheme={"red"}
+            >
+              {message}
+            </Alert>
           </Flex>
         </Flex>
       </Flex>

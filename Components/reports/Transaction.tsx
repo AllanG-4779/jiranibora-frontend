@@ -11,7 +11,11 @@ export const TrxPDF = (props: any) => {
   const transactions: transactionType[] = props.transactions;
   return (
     <Document>
-      <Page size={"A4"} style={{ display: "flex", flexDirection: "column" }}>
+      <Page
+        size={"A4"}
+        wrap={true}
+        style={{ display: "flex", flexDirection: "column" }}
+      >
         <View
           id="header"
           style={{
@@ -258,9 +262,22 @@ export const TrxPDF = (props: any) => {
                 <Text>Description</Text>
               </View>
               <View
-                style={{ ...styles.tableColumn, borderColor: "dodgerblue" }}
+                style={{
+                  ...styles.tableColumn,
+
+                  width: "15%",
+                }}
               >
-                <Text>Amount</Text>
+                <Text style={{ textAlign: "center" }}>Amt In</Text>
+              </View>
+              <View
+                style={{
+                  ...styles.tableColumn,
+
+                  width: "15%",
+                }}
+              >
+                <Text style={{ textAlign: "center" }}>Amt Out</Text>
               </View>
               <View
                 style={{ ...styles.tableColumn, borderColor: "dodgerblue" }}
@@ -276,16 +293,89 @@ export const TrxPDF = (props: any) => {
                 <View style={styles.tableColumn}>
                   <Text>{each.transactioncategory}</Text>
                 </View>
-                <View style={styles.tableColumn}>
-                  <Text>KES{each.transactionAmount}</Text>
+                <View
+                  style={{
+                    ...styles.tableColumn,
+
+                    width: "15%",
+                  }}
+                >
+                  {each.transactioncategory === "Contribution" ? (
+                    <Text style={{ color: "#3A7F3E" }}>
+                      +KES{each.transactionAmount}
+                    </Text>
+                  ) : (
+                    ""
+                  )}
+                </View>
+                <View
+                  style={{
+                    ...styles.tableColumn,
+
+                    width: "15%",
+                  }}
+                >
+                  {each.transactioncategory !== "Contribution" ? (
+                    <Text style={{ color: "#AC2828" }}>
+                      -KES{each.transactionAmount}
+                    </Text>
+                  ) : (
+                    ""
+                  )}
                 </View>
                 <View style={styles.tableColumn}>
-                  <Text>{`${dateDescription(
-                    getTimeDetails(each.transactionDate).date
-                  )} ${getTimeDetails(each.transactionDate).time} `}</Text>
+                  <Text>
+                    {moment(each.transactionDate).add(3, "hours").format("lll")}
+                  </Text>
                 </View>
               </View>
             ))}
+          </View>
+          <View
+            style={{
+              ...styles.tableRow,
+              border: "1px solid #d3d3d3",
+              borderTopColor: "white",
+            }}
+          >
+            <View style={{ ...styles.tableColumn, width: "50%" }}>
+              <Text style={{ fontWeight: "bold", fontSize: "17px" }}>
+                Total
+              </Text>
+            </View>
+            <View style={{ ...styles.tableColumn, width: "15%" }}>
+              <Text style={{ fontWeight: "bold" }}>
+                {formatNumber(
+                  transactions
+                    .filter(
+                      (each) => each.transactioncategory === "Contribution"
+                    )
+                    .reduce(
+                      (prev, current) => prev + current.transactionAmount,
+                      0
+                    )
+                )}
+              </Text>
+            </View>
+            <View style={{ ...styles.tableColumn, width: "15%" }}>
+              <Text style={{ fontWeight: "bold" }}>
+                {" "}
+                {formatNumber(
+                  transactions
+                    .filter(
+                      (each) =>
+                        each.transactioncategory === "Penalty" ||
+                        each.transactioncategory === "Fine" ||
+                        each.transactioncategory === "Loan Repayment"
+                    )
+                    .reduce(
+                      (prev, current) => prev + current.transactionAmount,
+                      0
+                    )
+                )}
+              </Text>
+            </View>
+            <View style={{ ...styles.tableColumn, width: "25%" }}></View>
           </View>
         </View>
         <View
@@ -318,9 +408,5 @@ export const TransactionPDF = (props: any) => {
   useEffect(() => {
     setClient(true);
   }, []);
-  return (
-    
-      <TrxPDF transactions={props.transactions} />
- 
-  );
+  return <TrxPDF transactions={props.transactions} />;
 };

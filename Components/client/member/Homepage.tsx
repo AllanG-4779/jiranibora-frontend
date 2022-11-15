@@ -7,6 +7,13 @@ import {
   Flex,
   Heading,
   Icon,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
   Spinner,
   Table,
   TableContainer,
@@ -16,38 +23,73 @@ import {
   Th,
   Thead,
   Tr,
+  VStack,
 } from "@chakra-ui/react";
 import { BiFile, BiSave } from "react-icons/bi";
 import { FaAd, FaAirFreshener, FaIndent } from "react-icons/fa";
 import { MdOutlineBusiness } from "react-icons/md";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import {
   ClientContext,
   clientPost,
   formatNumber,
   TokenContext,
 } from "../../../Commons";
+import AlertBox from "../Signup/Alert";
+import { useRouter } from "next/router";
 
 const ClientDashboard = () => {
   const clientData = useContext(ClientContext);
   const sessionToken = useContext(TokenContext);
+  const [paymentLoader, setPaymentLoader] = useState(false);
+  const [message, setMessage] = useState("");
+  const [size, setSize] = useState(-100);
+  const [type, setType] = useState("");
+  const router = useRouter();
 
   const payFine = async (category: string, meetingId: string) => {
+    setPaymentLoader(true);
     const result = await clientPost({
       token: sessionToken.token,
       url: `/pay/fine/${category}/${meetingId}`,
       method: "PUT",
     });
-    console.log(result);
+    setPaymentLoader(false);
+    if (result > 299) {
+      setType("error");
+      setMessage("Payment failed");
+      setSize(0.1);
+    } else {
+      setType("success");
+      setMessage("Payment processing successful");
+      setSize(0.1);
+    }
+    setTimeout(() => {
+      router.reload();
+    }, 1000);
   };
 
   // make penalty payment
   const payPenalty = async (penaltyId: string) => {
+    setPaymentLoader(true);
     const paymentResult = await clientPost({
       token: sessionToken.token,
       url: `pay/penalty?penaltyId=${penaltyId}`,
       method: "PUT",
     });
+    setPaymentLoader(false);
+    if (paymentResult > 299) {
+      setType("error");
+      setMessage("Payment failed");
+      setSize(0.1);
+    } else {
+      setType("success");
+      setMessage("Payment processing successful");
+      setSize(0.1);
+    }
+    setTimeout(() => {
+      router.reload();
+    }, 1000);
   };
 
   return (
@@ -88,7 +130,6 @@ const ClientDashboard = () => {
             minWidth={"14rem"}
             fontFamily="body"
             flexWrap="wrap"
-            
           >
             <Text fontWeight="bold" color="green.500" fontSize=".8em">
               Savings
@@ -212,14 +253,7 @@ const ClientDashboard = () => {
         </Flex>
       </Flex>
       {/* Fines & penalties */}
-      <Flex
-        bg="white"
-        direction="column"
-        gap={4}
-        p={4}
-        rounded="md"
-      
-      >
+      <Flex bg="white" direction="column" gap={4} p={4} rounded="md">
         <Heading fontSize="2xl">Penalties</Heading>
         <Flex direction={"column"} width="100%">
           <Flex overflow={"auto"}>
@@ -244,36 +278,49 @@ const ClientDashboard = () => {
                       <Th>Action</Th>
                     </Tr>
                   </Thead>
-                  <Tbody>
-                    {clientData?.penalties.map((each) => {
-                      return (
-                        <Tr key={each.penaltyCode}>
-                          <Td>{each.meetMonth}</Td>
-                          <Td>{each.dateAdded.split("T")[0]}</Td>
-                          <Td>KES {each.amount}</Td>
-                          <Td>
-                            <Badge colorScheme="red">{"Pending"}</Badge>
-                          </Td>
-                          <Td>
-                            <Button
-                              size="xs"
-                              colorScheme="green"
-                              onClick={() => payPenalty(each.penaltyCode)}
-                            >
-                              Pay now
-                            </Button>
-                          </Td>
-                        </Tr>
-                      );
-                    })}
-                  </Tbody>
+                  {!paymentLoader ? (
+                    <Tbody>
+                      {clientData?.penalties.map((each) => {
+                        return (
+                          <Tr key={each.penaltyCode}>
+                            <Td>{each.meetMonth}</Td>
+                            <Td>{each.dateAdded.split("T")[0]}</Td>
+                            <Td>KES {each.amount}</Td>
+                            <Td>
+                              <Badge colorScheme="red">{"Pending"}</Badge>
+                            </Td>
+                            <Td>
+                              <Button
+                                size="xs"
+                                colorScheme="green"
+                                onClick={() => payPenalty(each.penaltyCode)}
+                              >
+                                {paymentLoader ? <Spinner /> : "Pay Now"}
+                              </Button>
+                            </Td>
+                          </Tr>
+                        );
+                      })}
+                    </Tbody>
+                  ) : (
+                    <VStack alignItems={"center"}>
+                      <Spinner />
+                    </VStack>
+                  )}
                 </Table>
               </TableContainer>
             )}
           </Flex>
         </Flex>
       </Flex>
-      <Flex bg="white" direction="column" gap={4} p={4} rounded="md" mb={"200px"} >
+      <Flex
+        bg="white"
+        direction="column"
+        gap={4}
+        p={4}
+        rounded="md"
+        mb={"200px"}
+      >
         <Heading fontSize="2xl">Fines</Heading>
         <Flex direction="column">
           <Flex overflow="auto">
@@ -320,6 +367,12 @@ const ClientDashboard = () => {
               </TableContainer>
             )}
           </Flex>
+          <AlertBox
+            size={size}
+            message={message}
+            type={type}
+            setSize={setSize}
+          />
         </Flex>
       </Flex>
     </>
