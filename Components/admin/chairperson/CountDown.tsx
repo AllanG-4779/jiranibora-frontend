@@ -16,9 +16,9 @@ const CountDown = (props: any) => {
   );
 
   useEffect(() => {
-    if (total > 1) {
+    if (total >= 1) {
       const timer = setInterval(() => {
-        return setTotal(total - 1);
+        return setTotal((prev: number) => prev - 1);
       }, 1000);
       return () => {
         clearInterval(timer);
@@ -46,40 +46,40 @@ const CountDown = (props: any) => {
         _hover={{ opacity: 1 }}
       >
         <Text fontWeight="bold">{props.title}</Text>
-        <Box
-          display={"flex"}
-          fontWeight="bolder"
-          color="white"
-          fontSize="1.2rem"
-          gap={4}
-        >
-          <Text>{days < 10 ? "0" + days : days}</Text>:
-          <Text>{hours < 10 ? "0" + hours : hours}</Text>:
-          <Text>{minutes < 10 ? "0" + minutes : minutes}</Text>:
-          <Text transition="all 400ms ease">
-            {seconds < 10 ? "0" + seconds : seconds}
-          </Text>
-        </Box>{" "}
-        <Box
-          display={"flex"}
-          fontSize=".8rem"
-          justifyContent="space-between"
-          ml={2}
-          color="white"
-          width="100%"
-        >
-          {total > 1 ? (
-            <>
+        {total > 0 ? (
+          <>
+            <Box
+              display={"flex"}
+              fontWeight="bolder"
+              color="white"
+              fontSize="1.2rem"
+              gap={4}
+            >
+              <Text>{days < 10 ? "0" + days : days}</Text>:
+              <Text>{hours < 10 ? "0" + hours : hours}</Text>:
+              <Text>{minutes < 10 ? "0" + minutes : minutes}</Text>:
+              <Text transition="all 400ms ease">
+                {seconds < 10 ? "0" + seconds : seconds}
+              </Text>
+            </Box>{" "}
+            <Box
+              display={"flex"}
+              fontSize=".8rem"
+              justifyContent="space-between"
+              ml={2}
+              color="white"
+              width="100%"
+            >
               {" "}
               <Text>Days</Text>
               <Text>Hours</Text>
               <Text>Minutes</Text>
               <Text>Seconds</Text>
-            </>
-          ) : (
-            <Text fontSize="normal">{props.endMessage}</Text>
-          )}
-        </Box>
+            </Box>
+          </>
+        ) : (
+          <Text fontSize="normal">{props.endMessage}</Text>
+        )}
       </Box>
     </>
   );

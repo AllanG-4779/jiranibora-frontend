@@ -87,6 +87,7 @@ const FineComponent = () => {
     // Validate
 
     const session = (await getSession()) as sessionType;
+    
     const request = await axios.post(
       `https://jiranibora.herokuapp.com/sms/send?phone=${phoneNumber}`,
       {},

@@ -25,6 +25,7 @@ import {
   Tbody,
 } from "@chakra-ui/react";
 import { ContactSupportRounded, Download } from "@mui/icons-material";
+import moment from "moment";
 import { useRouter } from "next/router";
 
 import { useEffect, useState } from "react";
@@ -48,6 +49,16 @@ const ContributionComponent = () => {
     useState<contributionSummary>([]);
   const [countContribution, setCount] = useState(0);
   const [authToken, setToken] = useState("");
+
+  // if cont is not null?
+  const total =
+    activeCont !== null && typeof activeCont !== "undefined"
+      ? ((new Date(activeCont.closeOn).getTime() +
+          3 * 60 *60 * 1000) -
+          new Date().getTime()) /
+        1000
+      : 0;
+  console.log("The total is ", total);
 
   const openContribution = async (duration: number, token: string) => {
     const result = await clientPost({
@@ -133,11 +144,7 @@ const ContributionComponent = () => {
               <Box>
                 <CountDown
                   title={`Contribution for ${activeCont.month} is ON and closes in`}
-                  seconds={
-                    (new Date(activeCont.closeOn).getTime() -
-                      new Date().getTime()) /
-                    1000
-                  }
+                  seconds={total}
                   endMessage={"Time is up Contribution is closed"}
                 />
               </Box>
