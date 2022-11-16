@@ -107,24 +107,25 @@ export type membercontribution = {
   penalty: number;
   date: string;
 };
+export type allLoans = {
+  loanId: string;
+  dateApplied: string;
+  dateApproved: string;
+  amount: number;
+  initialDuration: number;
+  initialInterest: number;
+  extraInterest: number;
+  outstandingAmount: number;
+
+  status: string;
+}[];
 export type loanDataType = {
   loanSummary: {
     allTimeBorrowing: number;
     allTimeInterest: number;
     declined: number;
   };
-  loanResponseList: {
-    loanId: string;
-    dateApplied: string;
-    dateApproved: string;
-    amount: number;
-    initialDuration: number;
-    initialInterest: number;
-    extraInterest: number;
-    outstandingAmount: number;
-
-    status: string;
-  }[];
+  loanResponseList: allLoans;
 };
 export type transactionType = {
   transactionId: string;

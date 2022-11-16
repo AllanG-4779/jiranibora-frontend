@@ -18,11 +18,14 @@ import {
   FormLabel,
   Input,
   FormErrorMessage,
+  TableContainer,
+  Thead,
 } from "@chakra-ui/react";
 import { Group, Money } from "@mui/icons-material";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FaDownload } from "react-icons/fa";
+import { FaDownload, FaFile } from "react-icons/fa";
+import Select from "react-select";
 import {
   checkAuthStatusAndReturnToken,
   clientPost,
@@ -32,12 +35,16 @@ import {
   getTimeDetails,
 } from "../../../Commons";
 import {
+  allLoans,
   loanApplicationDetail,
+  loanDataType,
   sessionType,
   treasurerHomePageType,
 } from "../../types";
 import { useRouter } from "next/router";
 import { getSession } from "next-auth/react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import LoanReport from "../../reports/LoanReport";
 
 const LoanComponent = () => {
   const [loans, setLoan] = useState<loanApplicationDetail[]>([]);
@@ -51,6 +58,8 @@ const LoanComponent = () => {
   const [status, setStatus] = useState(1);
   const [message, setMessage] = useState("");
   const [authToken, setToken] = useState("");
+  const [reportData, setReportData] = useState<allLoans | null>(null);
+  const [loanFilter, setLoanFilter] = useState("");
 
   const initToken = async () => {
     const userToken = (await getSession()) as sessionType;
@@ -75,6 +84,19 @@ const LoanComponent = () => {
         throw new Error("Something went wrong");
       }
     };
+    // fetch all loans
+    const getReportData = async () => {
+      const session = (await getSession()) as sessionType;
+      const data = await fetchData({
+        token: session.user.access_token,
+        method: "GET",
+        url: "loan/loan/all",
+      });
+      console.log(data);
+      if (data) {
+        setReportData(data);
+      }
+    };
     const getLoanSummary = async () => {
       const fetchToken = await initToken();
       if (!fetchToken) {
@@ -88,7 +110,7 @@ const LoanComponent = () => {
         return loanSummary;
       }
     };
-
+    getReportData();
     getLoans()
       .then((e) => setLoan(e))
       .catch((error) => console.log(error));
@@ -120,6 +142,7 @@ const LoanComponent = () => {
       setMessage("Processing failed");
     }
   };
+
   return (
     <>
       <Flex
@@ -132,6 +155,7 @@ const LoanComponent = () => {
         <Heading fontFamily={"body"} fontWeight="normal" fontSize={"2xl"}>
           Loan Management
         </Heading>
+
         <Flex
           mt={5}
           justifyContent="space-between"
@@ -248,7 +272,6 @@ const LoanComponent = () => {
             </Flex>
           </Flex>
         </Flex>
-      
 
         <Flex
           gap={4}
