@@ -20,6 +20,8 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@chakra-ui/react";
+import axios from "axios";
+import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import {
@@ -29,7 +31,8 @@ import {
   fetchData,
   getTimeDetails,
 } from "../../../Commons";
-import { memberToFineType, pendingFineType } from "../../types";
+import AlertBox from "../../client/Signup/Alert";
+import { memberToFineType, pendingFineType, sessionType } from "../../types";
 import FineCategoryAdditionModal from "./FineCategoryAdditionModal";
 import FinePaymentModal from "./FinePaymentModal";
 
@@ -51,6 +54,9 @@ const FineComponent = () => {
     memberId: "",
   });
   const [fineModal, setFineModal] = useState(false);
+  const [fineMessage, setFineMessage] = useState("");
+  const [fineLoading, setFineLoading] = useState(false);
+  const [size, setSize] = useState(-100);
 
   const router = useRouter();
 
@@ -74,6 +80,30 @@ const FineComponent = () => {
       setmemberTofine(fineSearch);
     }
   };
+
+  // Send SMS reminder
+  const sendReminder = async (phoneNumber: string) => {
+    setFineLoading(true);
+    // Validate
+
+    const session = (await getSession()) as sessionType;
+    const request = await axios.post(
+      `https://jiranibora.herokuapp.com/sms/send?phone=${phoneNumber}`,
+      {},
+      { headers: { Authorization: `Bearer ${session.user.access_token}` } }
+    );
+    setFineLoading(false);
+    setSize(0.1);
+    if (request.data) {
+      //
+      // setLoading(false)
+      setFineMessage("Reminder sent successfully.");
+    } else {
+      // handle error
+      setFineMessage("Failed. ensure that the number is verified with Twilio.");
+    }
+  };
+
   // Add fine to member account
   const enforceFine = async (token: string) => {
     setSearchParam("");
@@ -344,9 +374,20 @@ const FineComponent = () => {
                           colorScheme="orange"
                           fontWeight={"lighter"}
                           size="xs"
+                          onClick={() => sendReminder(each.phone)}
                         >
-                          Remind
+                          {fineLoading ? <Spinner /> : "Remind"}
                         </Button>
+                        <AlertBox
+                          message={fineMessage}
+                          type={
+                            fineMessage.startsWith("Remind")
+                              ? "success"
+                              : "error"
+                          }
+                          size={size}
+                          setSize={setSize}
+                        />
                       </Box>
                     </Flex>
                   </Flex>

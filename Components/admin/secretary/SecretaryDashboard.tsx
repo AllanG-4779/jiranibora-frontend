@@ -25,7 +25,7 @@ import { IoMdAnalytics, IoMdPeople } from "react-icons/io";
 import LineChart from "../../Linechart";
 import { ArrowRight } from "@mui/icons-material";
 import { useEffect, useState } from "react";
-import { secHomePage } from "../../types";
+import { secHomePage, sessionType } from "../../types";
 import {
   checkAuthStatusAndReturnToken,
   dateDescription,
@@ -33,6 +33,8 @@ import {
   getTimeDetails,
 } from "../../../Commons";
 import { useRouter } from "next/router";
+import axios from "axios";
+import { getSession } from "next-auth/react";
 
 //var CanvasJSReact = require('./canvasjs.react');
 
@@ -40,6 +42,9 @@ const SecretaryDashboard = () => {
   const [authToken, setToken] = useState("");
   const [homepageData, setHomeData] = useState<secHomePage | null>(null);
   const router = useRouter();
+  const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     checkAuthStatusAndReturnToken(router, "SEC").then((tokenFound) => {
@@ -49,6 +54,36 @@ const SecretaryDashboard = () => {
       .then((result) => setHomeData(result))
       .catch((error) => console.log(error));
   }, [authToken]);
+  const sendReminder = async (phoneNumber: string) => {
+    setLoading(true);
+    // Validate
+    if (phone.length < 9 || phone.length > 9) {
+      setMessage("Invalid Phone number");
+      setTimeout(() => setMessage(""), 5000);
+      return;
+    }
+    if (!(phone.charAt(0) === "7") && !(phone.charAt(0) === "1")) {
+      setMessage("Start with 7 or 1 please.");
+      setTimeout(() => setMessage(""), 5000);
+      return;
+    }
+
+    const session = (await getSession()) as sessionType;
+    const request = await axios.post(
+      `https://jiranibora.herokuapp.com/sms/send?phone=${phoneNumber}`,
+      {},
+      { headers: { Authorization: `Bearer ${session.user.access_token}` } }
+    );
+    setLoading(false);
+    if (request.data) {
+      //
+      // setLoading(false)
+      setMessage("Reminder sent successfully.");
+    } else if (request.status !== 200) {
+      // handle error
+      setMessage("Failed. ensure that the number is verified with Twilio.");
+    }
+  };
   // Fetch the homepage data on page load
   const getHomePage = async (token: string) => {
     const secretaryData = await fetchData({
@@ -215,16 +250,7 @@ const SecretaryDashboard = () => {
               <Text fontSize="lg" fontWeight={"semibold"}>
                 Quick Actions
               </Text>
-              <Button
-                colorScheme="green"
-                size="xs"
-                gap={5}
-                p={2}
-                flexDir="row-reverse"
-              >
-                <FaDownload color="white" />
-                Get Fine Report
-              </Button>
+
               <Box
                 gap={2}
                 display="flex"
@@ -235,9 +261,24 @@ const SecretaryDashboard = () => {
                 <Text>Fine Reminder</Text>
                 <InputGroup>
                   <InputLeftAddon>+254</InputLeftAddon>
-                  <Input />
+                  <Input
+                    type="number"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
                 </InputGroup>
-                <Button size="sm" colorScheme="blue" mt={4}>
+                <Alert
+                  display={message.length > 0 ? "flex" : "none"}
+                  colorScheme={message.startsWith("Reminder") ? "green" : "red"}
+                >
+                  {message}
+                </Alert>
+                <Button
+                  onClick={() => sendReminder(phone)}
+                  size="sm"
+                  colorScheme="blue"
+                  mt={4}
+                >
                   Send fine Reminder
                 </Button>
               </Box>
