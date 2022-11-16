@@ -31,7 +31,9 @@ export type summary = {
     contributions: {
       contributionId: string;
       contributionMonth: string;
+      amount: number;
       penalty: number;
+      status: string;
     }[];
   };
 };
@@ -83,7 +85,7 @@ const MemberEarningReport: React.FC<{ report: summary }> = ({ report }) => {
 
           <View style={styles.summary}>
             <View style={styles.summaryContent}>
-              <Text style={styles.amount}>+{report.sender.phoneNumber}</Text>
+              <Text style={styles.amount}>+254{report.sender.phoneNumber}</Text>
               <Text style={styles.description}>Phone number</Text>
             </View>
             <View style={styles.summaryContent}>
@@ -162,27 +164,53 @@ const MemberEarningReport: React.FC<{ report: summary }> = ({ report }) => {
               <Text style={styles.section}>Contributions</Text>
               <View style={styles.table}>
                 <View style={styles.tableRow}>
-                  <View style={{ ...styles.tableColumn, width: "33.33%" }}>
+                  <View style={{ ...styles.tableColumn, width: "20%" }}>
                     <Text>Contribution ID</Text>
                   </View>
-                  <View style={{ ...styles.tableColumn, width: "33.33%" }}>
+                  <View style={{ ...styles.tableColumn, width: "20%" }}>
                     <Text>Contribution Month</Text>
                   </View>
-                  <View style={{ ...styles.tableColumn, width: "33.33%" }}>
+                  <View style={{ ...styles.tableColumn, width: "20%" }}>
+                    <Text>Contribution Amount</Text>
+                  </View>
+                  <View style={{ ...styles.tableColumn, width: "20%" }}>
                     <Text>Penalty Amount</Text>
+                  </View>
+                  <View style={{ ...styles.tableColumn, width: "20%" }}>
+                    <Text>Status</Text>
                   </View>
                 </View>
                 {report.data.contributions.map((each) => {
                   return (
                     <View style={styles.tableRow} key={each.contributionId}>
-                      <View style={{ ...styles.tableColumn, width: "33.33%" }}>
+                      <View style={{ ...styles.tableColumn, width: "20%" }}>
                         <Text>{each.contributionId}</Text>
                       </View>
-                      <View style={{ ...styles.tableColumn, width: "33.33%" }}>
+                      <View style={{ ...styles.tableColumn, width: "20%" }}>
                         <Text>{each.contributionMonth}</Text>
                       </View>
-                      <View style={{ ...styles.tableColumn, width: "33.33%" }}>
-                        <Text>{each.penalty}</Text>
+                      <View style={{ ...styles.tableColumn, width: "20%" }}>
+                        <Text color="#3A7F3E">{each.amount}</Text>
+                      </View>
+                      <View style={{ ...styles.tableColumn, width: "20%" }}>
+                        <Text
+                          style={{
+                            color:
+                              each.status === "Paid" ? "#3A7F3E" : "#AC2828",
+                          }}
+                        >
+                          {each.penalty}
+                        </Text>
+                      </View>
+                      <View style={{ ...styles.tableColumn, width: "20%" }}>
+                        <Text
+                          style={{
+                            color:
+                              each.status === "Paid" ? "#3A7F3E" : "#AC2828",
+                          }}
+                        >
+                          {each.status}
+                        </Text>
                       </View>
                     </View>
                   );
@@ -192,15 +220,43 @@ const MemberEarningReport: React.FC<{ report: summary }> = ({ report }) => {
                 style={{
                   ...styles.tableRow,
                   ...styles.total,
-                  border: "1px solid #d3d3d3",
-                  padding: "5px",
+
                   borderTopColor: "transparent",
                 }}
               >
-                <Text style={{ fontSize: "15px" }}>Total Contributions </Text>
-                <Text style={{ fontSize: "13px" }}>
-                  {report.data.summary.totalContributions}
-                </Text>
+                <View style={{ ...styles.tableColumn, width: "40%" }}>
+                  <Text style={{ fontSize: "15px" }}>Total</Text>
+                </View>
+                <View style={{ ...styles.tableColumn, width: "20%" }}>
+                  <Text
+                    style={{ fontSize: "13px", width: "20%", color: "#3A7F3E" }}
+                  >
+                    {formatNumber(report.data.summary.totalContributions)}
+                  </Text>
+                </View>
+
+                <View style={{ ...styles.tableColumn, width: "20%" }}>
+                  <Text
+                    style={{ fontSize: "13px", width: "20%", color: "#3A7F3E" }}
+                  >
+                    {formatNumber(
+                      report.data.contributions
+                        .filter((each) => each.status === "Paid")
+                        .reduce((prev, curr) => prev + curr.penalty, 0)
+                    )}
+                  </Text>
+                </View>
+                <View style={{ ...styles.tableColumn, width: "20%" }}>
+                  <Text
+                    style={{ fontSize: "13px", width: "20%", color: "#AC2828" }}
+                  >
+                    {formatNumber(
+                      report.data.contributions
+                        .filter((each) => each.status !== "Paid")
+                        .reduce((prev, curr) => prev + curr.penalty, 0)
+                    )}
+                  </Text>
+                </View>
               </View>
             </View>
 

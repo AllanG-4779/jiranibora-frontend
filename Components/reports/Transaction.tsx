@@ -344,7 +344,13 @@ export const TrxPDF = (props: any) => {
               </Text>
             </View>
             <View style={{ ...styles.tableColumn, width: "15%" }}>
-              <Text style={{ fontWeight: "bold" }}>
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "17px",
+                  color: "#3A7F3E",
+                }}
+              >
                 {formatNumber(
                   transactions
                     .filter(
@@ -358,7 +364,13 @@ export const TrxPDF = (props: any) => {
               </Text>
             </View>
             <View style={{ ...styles.tableColumn, width: "15%" }}>
-              <Text style={{ fontWeight: "bold" }}>
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "17px",
+                  color: "#AC2828",
+                }}
+              >
                 {" "}
                 {formatNumber(
                   transactions
@@ -383,8 +395,7 @@ export const TrxPDF = (props: any) => {
           style={{
             height: "50px",
             backgroundColor: "#2e86d2",
-            position: "absolute",
-            bottom: "0",
+
             width: "100%",
             color: "white",
             display: "flex",

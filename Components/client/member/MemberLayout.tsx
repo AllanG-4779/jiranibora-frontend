@@ -470,6 +470,7 @@ const MemberLayout = ({ children }: content) => {
                       </Text>
                     </Tooltip>
                     <PDFDownloadLink
+                    fileName={`${memberReport?.sender.memberId}_Report`}
                       style={{ position: "absolute", top:90, right: 400 }}
                       document={<MemberEarningReport report={memberReport!} />}
                     >
