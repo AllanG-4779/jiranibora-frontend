@@ -44,7 +44,7 @@ import {
 import { useRouter } from "next/router";
 import { getSession } from "next-auth/react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import LoanReport from "../../reports/LoanReport";
+
 
 const LoanComponent = () => {
   const [loans, setLoan] = useState<loanApplicationDetail[]>([]);
