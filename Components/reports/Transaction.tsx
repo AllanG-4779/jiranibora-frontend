@@ -390,25 +390,6 @@ export const TrxPDF = (props: any) => {
             <View style={{ ...styles.tableColumn, width: "25%" }}></View>
           </View>
         </View>
-        <View
-          fixed
-          style={{
-            height: "50px",
-            backgroundColor: "#2e86d2",
-
-            width: "100%",
-            color: "white",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            fontSize: "10px",
-            lineHeight: "1.5px",
-          }}
-        >
-          <Text>Jirani Bora Saving And Credit</Text>
-          <Text>&copy; 2022</Text>
-        </View>
       </Page>
     </Document>
   );
