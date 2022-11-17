@@ -112,6 +112,8 @@ export type allLoans = {
   dateApplied: string;
   dateApproved: string;
   amount: number;
+  member:string;
+  memberId:string
   initialDuration: number;
   initialInterest: number;
   extraInterest: number;

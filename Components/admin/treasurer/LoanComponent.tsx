@@ -20,6 +20,12 @@ import {
   FormErrorMessage,
   TableContainer,
   Thead,
+  Table,
+  Th,
+  Tbody,
+  Tr,
+  Td,
+  Badge,
 } from "@chakra-ui/react";
 import { Group, Money } from "@mui/icons-material";
 import Link from "next/link";
@@ -45,7 +51,6 @@ import { useRouter } from "next/router";
 import { getSession } from "next-auth/react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 
-
 const LoanComponent = () => {
   const [loans, setLoan] = useState<loanApplicationDetail[]>([]);
   const [loanSummary, setLoanSummary] = useState<treasurerHomePageType | null>(
@@ -60,6 +65,7 @@ const LoanComponent = () => {
   const [authToken, setToken] = useState("");
   const [reportData, setReportData] = useState<allLoans | null>(null);
   const [loanFilter, setLoanFilter] = useState("");
+  const [total, setTotal] = useState(0);
 
   const initToken = async () => {
     const userToken = (await getSession()) as sessionType;
@@ -420,6 +426,75 @@ const LoanComponent = () => {
                 All borrowers have paid back their debts
               </Alert>
             )}
+          </Flex>
+          <Flex bg="white" width="100%">
+            <TableContainer width="80%" margin="auto" padding={10}>
+              <Input
+                type="text"
+                value={loanFilter}
+                width={["100%", "50%", "30%"]}
+                onChange={(e) => setLoanFilter(e.target.value)}
+              />
+              <Table>
+                <Thead>
+                  <Th>Name</Th>
+                  <Th>Member ID</Th>
+                  <Th>Amount Borrowed</Th>
+                  <Th>Initial Interest</Th>
+                  <Th>Overdue Charge</Th>
+                  <Th>Outstanding Amount</Th>
+                  <Th>Status</Th>
+                  <Th>Total Unpaid</Th>
+                </Thead>
+                <Tbody>
+                  {reportData !== null &&
+                    reportData!
+                      .filter((each) => {
+                        return (
+                          each.member.includes(loanFilter) ||
+                          each.status.includes(loanFilter) ||
+                          each.outstandingAmount.toString().includes(loanFilter)
+                        );
+                      })
+                      .map((loan, index) => {
+                        return (
+                          <Tr>
+                            <Td>{loan.member}</Td>
+                            <Td>{loan.memberId}</Td>
+                            <Td>KES {loan.amount}</Td>
+                            <Td>KES {loan.initialInterest}</Td>
+                            <Td>KES {loan.extraInterest}</Td>
+                            <Td>KES {loan.outstandingAmount}</Td>
+                            <Td>
+                              <Badge
+                                colorScheme={
+                                  loan.status === "Completed" ? "green" : "red"
+                                }
+                              >
+                                {loan.status}
+                              </Badge>
+                            </Td>
+                            <Td fontWeight="bolder">
+                              {" "}
+                              KES{" "}
+                              {reportData
+                                .slice(0, index)
+                                .reduce(
+                                  (prev, current) =>
+                                    prev + current.outstandingAmount,
+                                  loan.outstandingAmount
+                                )}
+                            </Td>
+                          </Tr>
+                        );
+                      })}
+                  <Tr>
+                    <Td>Total Outstanding</Td>
+                    <Td>Tot</Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            </TableContainer>
           </Flex>
         </Flex>
         <Modal isOpen={isOpen} onClose={onClose}>
