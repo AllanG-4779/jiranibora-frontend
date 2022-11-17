@@ -142,6 +142,7 @@ const LoanComponent = () => {
     if (repay == 200) {
       console.log("Success");
       setStatus(200);
+      router.reload()
     } else {
       console.log("Something went wrong" + repay);
       setStatus(0);
@@ -429,11 +430,15 @@ const LoanComponent = () => {
           </Flex>
           <Flex bg="white" width="100%">
             <TableContainer width="80%" margin="auto" padding={10}>
+              <Heading fontSize={"1.3rem"} color="GrayText" mb={5}>
+                All Approved Loans
+              </Heading>
               <Input
                 type="text"
                 value={loanFilter}
                 width={["100%", "50%", "30%"]}
                 onChange={(e) => setLoanFilter(e.target.value)}
+                placeholder={"Search"}
               />
               <Table>
                 <Thead>
@@ -488,17 +493,14 @@ const LoanComponent = () => {
                           </Tr>
                         );
                       })}
-                  <Tr>
-                    <Td>Total Outstanding</Td>
-                    <Td>Tot</Td>
-                  </Tr>
+                 
                 </Tbody>
               </Table>
             </TableContainer>
           </Flex>
         </Flex>
         <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalOverlay />
+          <ModalOverlay  />
           <ModalContent>
             <ModalHeader bg="twitter.500" color={"white"} p={2}>
               Confirm Manual Payment
