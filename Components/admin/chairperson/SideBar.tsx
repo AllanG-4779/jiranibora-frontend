@@ -1,5 +1,5 @@
 import { Box, Flex, HStack, VStack, Text } from "@chakra-ui/react";
-import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
+import { FaThumbsDown, FaThumbsUp, FaUser } from "react-icons/fa";
 import { RiHome8Fill } from "react-icons/ri";
 import { MdPending } from "react-icons/md";
 import { FiLogOut, FiVolumeX } from "react-icons/fi";
@@ -89,7 +89,18 @@ export const SideBar = () => {
             <a>Disapproved</a>
           </Link>
         </Flex>
-      
+        <Flex
+          as="li"
+          gap={3}
+          padding={2}
+          width="90%"
+          className={router.pathname.includes("user_role") ? "active" : ""}
+        >
+          <FaUser color="white" fontSize={"1.3rem"} />
+          <Link passHref href="/admin/chair/user_role">
+            <a>Roles</a>
+          </Link>
+        </Flex>
       </Flex>
       <Flex
         ml={3}
@@ -99,8 +110,8 @@ export const SideBar = () => {
         gap={3}
         color="white"
         padding={2}
-        onClick={async() => {
-         await signOut({callbackUrl:"/admin/login"});
+        onClick={async () => {
+          await signOut({ callbackUrl: "/admin/login" });
         }}
       >
         <FiLogOut color="white" fontSize={"1.3rem"} />
