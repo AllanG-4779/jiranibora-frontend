@@ -111,7 +111,7 @@ const MemberEarningReport: React.FC<{ report: summary }> = ({ report }) => {
                   color: "dodgerblue",
                 }}
               >
-                KES {formatNumber(report.data.summary.netEarning)}
+                KES {formatNumber(report.data?.summary.netEarning)}
               </Text>
               <Text
                 style={{
@@ -126,8 +126,8 @@ const MemberEarningReport: React.FC<{ report: summary }> = ({ report }) => {
             <View style={styles.summaryContent}>
               <Text style={{ ...styles.amount, color: "#005900" }}>
                 {(
-                  (report.data.summary.interestEarned /
-                    report.data.summary.totalContributions) *
+                  (report.data?.summary.interestEarned /
+                    report.data?.summary.totalContributions) *
                   100
                 ).toFixed(2)}
                 %
@@ -180,7 +180,7 @@ const MemberEarningReport: React.FC<{ report: summary }> = ({ report }) => {
                     <Text>Status</Text>
                   </View>
                 </View>
-                {report.data.contributions.map((each) => {
+                {report.data?.contributions.map((each) => {
                   return (
                     <View style={styles.tableRow} key={each.contributionId}>
                       <View style={{ ...styles.tableColumn, width: "20%" }}>
@@ -231,7 +231,7 @@ const MemberEarningReport: React.FC<{ report: summary }> = ({ report }) => {
                   <Text
                     style={{ fontSize: "13px", width: "20%", color: "#3A7F3E" }}
                   >
-                    {formatNumber(report.data.summary.totalContributions)}
+                    {formatNumber(report.data?.summary.totalContributions)}
                   </Text>
                 </View>
 
@@ -240,7 +240,7 @@ const MemberEarningReport: React.FC<{ report: summary }> = ({ report }) => {
                     style={{ fontSize: "13px", width: "20%", color: "#3A7F3E" }}
                   >
                     {formatNumber(
-                      report.data.contributions
+                      report.data?.contributions
                         .filter((each) => each.status === "Paid")
                         .reduce((prev, curr) => prev + curr.penalty, 0)
                     )}
@@ -251,7 +251,7 @@ const MemberEarningReport: React.FC<{ report: summary }> = ({ report }) => {
                     style={{ fontSize: "13px", width: "20%", color: "#AC2828" }}
                   >
                     {formatNumber(
-                      report.data.contributions
+                      report.data?.contributions
                         .filter((each) => each.status !== "Paid")
                         .reduce((prev, curr) => prev + curr.penalty, 0)
                     )}
@@ -277,7 +277,7 @@ const MemberEarningReport: React.FC<{ report: summary }> = ({ report }) => {
                     <Text>Pending Amount</Text>
                   </View>
                 </View>
-                {report.data.loans.map((each) => {
+                {report.data?.loans.map((each) => {
                   return (
                     <View style={styles.tableRow} key={each.dateApproved}>
                       <View style={styles.tableColumn}>
@@ -309,7 +309,7 @@ const MemberEarningReport: React.FC<{ report: summary }> = ({ report }) => {
                   Total Loan Balance Deducted
                 </Text>
                 <Text style={{ fontSize: "13px" }}>
-                  {report.data.loans.reduce(
+                  {report.data?.loans.reduce(
                     (prev, curr) =>
                       prev + curr.pendingAmount + curr.pendingInterests,
                     0
@@ -336,7 +336,7 @@ const MemberEarningReport: React.FC<{ report: summary }> = ({ report }) => {
                     <Text>Paid</Text>
                   </View>
                 </View>
-                {report.data.fines.map((each) => {
+                {report.data?.fines.map((each) => {
                   return (
                     <View style={styles.tableRow} key={each.meetingId}>
                       <View style={styles.tableColumn}>
@@ -368,7 +368,7 @@ const MemberEarningReport: React.FC<{ report: summary }> = ({ report }) => {
                   Fines Deducted
                 </Text>
                 <Text style={{ fontSize: "13px" }}>
-                  {report.data.fines
+                  {report.data?.fines
                     .filter((each) => !each.status)
                     .reduce((prev, curr) => prev + curr.amount, 0)}
                 </Text>

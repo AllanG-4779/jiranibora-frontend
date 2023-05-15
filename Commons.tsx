@@ -4,7 +4,7 @@ import { getSession, signOut } from "next-auth/react";
 import React from "react";
 
 import { backendJWT, clientData, sessionType } from "./Components/types";
-import {NextRouter} from "next/router";
+import { NextRouter } from "next/router";
 
 // post data to external API
 type postParams = {
@@ -27,7 +27,7 @@ export const clientPost = async (params: postParams) => {
       headers,
       data,
     });
-    console.log("The info being posted to "+url + " is " +post)
+    console.log("The info being posted to " + url + " is " + post);
     if (post.status < 300) {
       return post.status;
     }
@@ -118,43 +118,54 @@ export const dateDescription = (dateString: string | undefined) => {
   }
 };
 export const formatNumber = (amount: any) => {
-  let newNumber = amount.toString();
+  let newNumber = amount?.toString();
   let decimal = "";
-  if (newNumber.includes(".")) {
-    decimal = "." + newNumber.split(".")[1];
-    newNumber = newNumber.split(".")[0];
+  if (typeof newNumber !== "undefined" && newNumber !== null) {
+    if (newNumber?.includes(".")) {
+      decimal = "." + newNumber.split(".")[1];
+      newNumber = newNumber.split(".")[0];
+    }
+    let init = "";
+    if (newNumber.length % 3 !== 0) {
+      init = newNumber.slice(0, newNumber.length % 3);
+      newNumber = newNumber.slice(newNumber.length % 3);
+    }
+    let startIndex = 0;
+    while (startIndex < newNumber.length) {
+      init += "," + newNumber.slice(startIndex, startIndex + 3);
+      startIndex += 3;
+    }
+    if (init.startsWith(",")) {
+      init = init.slice(1);
+    }
+    return init + decimal;
   }
-  let init = "";
-  if (newNumber.length % 3 !== 0) {
-    init = newNumber.slice(0, newNumber.length % 3);
-    newNumber = newNumber.slice(newNumber.length % 3);
-  }
-  let startIndex = 0;
-  while (startIndex < newNumber.length) {
-    init += "," + newNumber.slice(startIndex, startIndex + 3);
-    startIndex += 3;
-  }
-  if (init.startsWith(",")) {
-    init = init.slice(1);
-  }
-  return init + decimal;
 };
-const hasTokenExpired = (currentTime:number)=>{
-    return (new Date().getTime()/1000)>currentTime
-}
+const hasTokenExpired = (currentTime: number) => {
+  return new Date().getTime() / 1000 > currentTime;
+};
 //Find and return session to the client
-export const checkAuthStatusAndReturnToken = async(router:NextRouter, role:string, destination="/admin/login")=>{
-//  First determine if there is session
-  const session = await getSession() as sessionType;
-  if(session){
-  //  Check if the current backend token is expired
-    const backendTokenExpiry = jwtDecode(session.user.access_token) as backendJWT;
-    if (hasTokenExpired(backendTokenExpiry.exp) || !(session.user.role.split(";").includes(role))){
-      signOut({callbackUrl:"/admin/login"})
-      await router.push(destination)
-      }
-    return session.user.access_token
-  }else{
-    await router.push("/admin/login")
+export const checkAuthStatusAndReturnToken = async (
+  router: NextRouter,
+  role: string,
+  destination = "/admin/login"
+) => {
+  //  First determine if there is session
+  const session = (await getSession()) as sessionType;
+  if (session) {
+    //  Check if the current backend token is expired
+    const backendTokenExpiry = jwtDecode(
+      session.user.access_token
+    ) as backendJWT;
+    if (
+      hasTokenExpired(backendTokenExpiry.exp) ||
+      !session.user.role.split(";").includes(role)
+    ) {
+      signOut({ callbackUrl: "/admin/login" });
+      await router.push(destination);
+    }
+    return session.user.access_token;
+  } else {
+    await router.push("/admin/login");
   }
-}
+};
